@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2020",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "jsx": "react",
+        "baseUrl": ".",
+        "esModuleInterop": true
+    },
+    "include": ["./src/common/**/*", "./src/web/**/*"]
+}

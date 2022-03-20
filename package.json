@@ -1,0 +1,56 @@
+{
+    "name": "teleprompter",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dest/index.js",
+    "scripts": {
+        "build": "webpack",
+        "build-web": "webpack",
+        "watch-web": "webpack --watch",
+        "watch": "concurrently --kill-others \"npm run watch-web\"  \"npm run browser-sync\" ",
+        "browser-sync": "browser-sync start --server dist/web --files \"dist/web/*.*\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/francbohuslav/teleprompter.git"
+    },
+    "author": "Bohuslav Franc",
+    "dependencies": {
+        "@emotion/react": "^11.8.2",
+        "@emotion/styled": "^11.8.1",
+        "@mui/material": "^5.5.1",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-router-dom": "^6.2.2"
+    },
+    "devDependencies": {
+        "@types/react": "^17.0.41",
+        "@types/react-dom": "^17.0.14",
+        "@types/react-draft-wysiwyg": "^1.13.4",
+        "@types/react-router-dom": "^5.3.3",
+        "@typescript-eslint/eslint-plugin": "^5.15.0",
+        "@typescript-eslint/parser": "^5.15.0",
+        "browser-sync": "^2.27.9",
+        "concurrently": "^7.0.0",
+        "copy-webpack-plugin": "^10.2.4",
+        "css-loader": "^6.7.1",
+        "eslint": "^8.11.0",
+        "eslint-plugin-react": "^7.29.4",
+        "html-webpack-plugin": "^5.5.0",
+        "less": "^4.1.2",
+        "less-loader": "^10.2.0",
+        "mini-css-extract-plugin": "^2.6.0",
+        "react-smooth-dnd": "^0.11.1",
+        "source-map-loader": "^3.0.1",
+        "style-loader": "^3.3.1",
+        "ts-loader": "^9.2.8",
+        "typescript": "^4.6.2",
+        "webpack": "^5.70.0",
+        "webpack-cli": "^4.9.2"
+    },
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/francbohuslav/teleprompter/issues"
+    },
+    "homepage": "https://github.com/francbohuslav/teleprompter#readme"
+}
