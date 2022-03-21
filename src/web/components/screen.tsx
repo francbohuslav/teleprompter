@@ -17,7 +17,8 @@ const Container = styled("div")({
     right: "25vw",
     top: "25vh",
     bottom: "25vh",
-    border: "1px solid gray",
+    border: "1px solid #333",
+    padding: "5px",
     overflow: "hidden",
 });
 
@@ -25,22 +26,36 @@ const TextBlock = styled("div")({
     fontFamily: "Tahoma",
     color: "white",
     fontSize: "20px",
+    transition: "margin-top 1s",
+    transitionTimingFunction: "linear",
 });
 
 export const Screen = () => {
     const [marginTop, setMarginTop] = useState(0);
-    setTimeout(() => {
-        setMarginTop(marginTop - 1);
-    }, 100);
+    const textBlockRef = React.useRef();
+
+    let isEnd = false;
+    if (textBlockRef.current) {
+        const height = (textBlockRef.current as HTMLDivElement).clientHeight;
+        if (height + marginTop < 0) {
+            isEnd = true;
+        }
+    }
+    if (!isEnd) {
+        setTimeout(() => {
+            setMarginTop(marginTop - 20);
+        }, 1000);
+    }
     return (
         <MainBlock>
             <Container>
                 <TextBlock
+                    ref={textBlockRef}
                     sx={{
                         marginTop: marginTop + "px",
                     }}
                 >
-                    {"text  fsd fs fasdfsdfs f sdf sdff ".repeat(100)}
+                    {"text  fsd fs fasdfsdfs f sdf sdff ".repeat(50)}
                 </TextBlock>
             </Container>
         </MainBlock>
