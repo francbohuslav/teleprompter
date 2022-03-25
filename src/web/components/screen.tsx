@@ -1,7 +1,23 @@
-import { LinearProgress, Typography } from "@mui/material";
+import { LinearProgress, Slider, Typography } from "@mui/material";
 import { styled } from "@mui/system";
+import NoSleep from "nosleep.js";
 import * as React from "react";
 import { useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { ClientToServerEvents, IPersistanceSettings, ServerToClientEvents } from "../../common/isocket";
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
+
+const noSleep = new NoSleep();
+
+document.addEventListener(
+    "click",
+    function enableNoSleep() {
+        document.removeEventListener("click", enableNoSleep, false);
+        noSleep.enable();
+    },
+    false
+);
 
 const MainBlock = styled("div")({
     position: "absolute",
@@ -25,13 +41,25 @@ const Container = styled("div")({
     wordBreak: "break-word",
 });
 
-const TextBlock = styled("div")({ fontFamily: "Tahoma", transition: "margin-top 1s", transitionTimingFunction: "linear" });
+const TextBlock = styled("div")({ fontFamily: "Tahoma", transition: "margin-top 1s", transitionTimingFunction: "linear", transform: "scale(-1,1)" });
 
-let timer = null;
 export const Screen = () => {
+    let timer: NodeJS.Timeout = null;
     const [marginTop, setMarginTop] = useState(100); //25vh dopocitat
-    const [speed, setSpeed] = useState(4);
+    const [settings, setSettings] = useState<IPersistanceSettings>(null);
     const textBlockRef = React.useRef();
+
+    React.useEffect(() => {
+        socket.on("setSettings", setSettings);
+        socket.on("shiftMargin", (amount) => {
+            setMarginTop((marginTop) => marginTop + amount);
+        });
+        return () => {
+            clearTimeout(timer);
+            socket.off("setSettings");
+            socket.off("shiftMargin");
+        };
+    });
 
     let isEnd = false;
     let percents = 0;
@@ -42,40 +70,74 @@ export const Screen = () => {
             isEnd = true;
         }
     }
-    if (!isEnd) {
+    if (!isEnd && settings?.speed) {
         timer = setTimeout(() => {
-            setMarginTop(marginTop - speed);
+            setMarginTop(marginTop - settings.speed);
         }, 300);
     }
 
+    const emitSettings = (settingsPart: Partial<IPersistanceSettings>) => {
+        const newSettings = { ...settings, ...settingsPart };
+        socket.emit("setSettings", newSettings);
+        setSettings(newSettings);
+    };
+
     const onWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
         if (e.shiftKey) {
-            clearTimeout(timer);
-            setMarginTop(marginTop + (e.deltaY > 0 ? -10 : 10));
-        } else {
+            const amount = e.deltaY > 0 ? -10 : 10;
+            setMarginTop(marginTop + amount);
+            socket.emit("shiftMargin", amount);
+        } else if (settings.speed) {
             const coef = e.deltaY > 0 ? 1.1 : 1 / 1.1;
-            const newSpeed = Math.max(0, Math.min(10, speed * coef));
-            if (newSpeed != speed) {
-                clearTimeout(timer);
-                setSpeed(newSpeed);
+            const newSpeed = Math.round(Math.max(0, Math.min(10, settings.speed * coef)) * 100) / 100;
+            if (newSpeed != settings.speed) {
+                emitSettings({ speed: newSpeed });
             }
         }
     };
 
-    return (
+    const onHorizontalSize = (_e: Event, value: any, _thump: number) => {
+        const newSize = {
+            ...settings.size,
+            left: value[0],
+            right: value[1],
+        };
+        emitSettings({ size: newSize });
+    };
+
+    const onVerticalSize = (_e: Event, value: any, _thump: number) => {
+        const newSize = {
+            ...settings.size,
+            bottom: value[0],
+            top: value[1],
+        };
+        emitSettings({ size: newSize });
+    };
+
+    return settings ? (
         <MainBlock onWheel={onWheel}>
-            <Typography>
-                Speed: {speed.toFixed(1)}
+            <Slider sx={{ margin: "0px 2vw 0", width: "96vw" }} value={[settings.size.left, settings.size.right]} onChange={onHorizontalSize} />
+            <Slider
+                orientation="vertical"
+                sx={{ position: "absolute", right: "0px", top: "2vh", height: "96vh" }}
+                value={[settings.size.bottom, settings.size.top]}
+                onChange={onVerticalSize}
+            />
+            <Typography sx={{ position: "absolute", bottom: "5px", left: "5px", width: "90vw" }}>
+                Speed: {settings.speed.toFixed(1)}
                 <br />
                 Margin top: {Math.round(marginTop)}
                 <br />
-                Percents: {percents.toFixed(0)}
-                <br />
-                Wheel changes speed
-                <br />
-                SHIFT + sheel scrolls text
+                Wheel changes speed, SHIFT + sheel scrolls text, noSleep: {noSleep.isEnabled ? "ON" : "off"}
             </Typography>
-            <Container>
+            <Container
+                sx={{
+                    top: 100 - settings.size.top + "vh",
+                    left: settings.size.left + "vw",
+                    right: 100 - settings.size.right + "vw",
+                    bottom: settings.size.bottom + "vh",
+                }}
+            >
                 <TextBlock
                     ref={textBlockRef}
                     sx={{
@@ -106,5 +168,7 @@ export const Screen = () => {
                 <LinearProgress sx={{ position: "absolute", left: 0, right: 0, top: 0, height: 3 }} value={percents} variant="determinate" />
             </Container>
         </MainBlock>
+    ) : (
+        <div></div>
     );
 };
