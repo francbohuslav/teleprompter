@@ -70,7 +70,7 @@ export const Screen = () => {
             isEnd = true;
         }
     }
-    if (!isEnd && settings?.speed) {
+    if (!isEnd && settings?.speed && !settings?.paused) {
         timer = setTimeout(() => {
             setMarginTop(marginTop - settings.speed);
         }, 300);
@@ -118,8 +118,14 @@ export const Screen = () => {
         emitSettings({ fontSize: value });
     };
 
+    const onKeyUp: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+        if (e.key === " ") {
+            emitSettings({ paused: !settings.paused });
+        }
+    };
+
     return settings ? (
-        <MainBlock onWheel={onWheel}>
+        <MainBlock tabIndex={0} onWheel={onWheel} onKeyUp={onKeyUp}>
             <Slider sx={{ margin: "0px 2vw 0", width: "96vw" }} value={[settings.size.left, settings.size.right]} onChange={onHorizontalSize} />
             <Slider
                 orientation="vertical"
@@ -137,6 +143,8 @@ export const Screen = () => {
                 Font size:{" "}
                 <Slider size="small" sx={{ width: "90px" }} max={60} min={5} value={settings.fontSize} onChange={onFontSize} valueLabelDisplay="auto" />{" "}
                 {settings.fontSize}
+                <br />
+                SPACE: pause
                 <br />
                 Wheel changes speed
                 <br />

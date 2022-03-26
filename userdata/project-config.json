@@ -5,8 +5,9 @@
       "left": 34,
       "right": 69,
       "top": 69,
-      "bottom": 14
+      "bottom": 10
     },
-    "fontSize": 26
+    "fontSize": 26,
+    "paused": false
   }
 }

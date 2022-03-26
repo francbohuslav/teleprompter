@@ -11,6 +11,7 @@ export interface ClientToServerEvents {
 export interface IPersistanceSettings {
     speed: number;
     fontSize: number;
+    paused: boolean;
     size: {
         top: number;
         left: number;
