@@ -114,6 +114,10 @@ export const Screen = () => {
         emitSettings({ size: newSize });
     };
 
+    const onFontSize = (_e: Event, value: any, _thump: number) => {
+        emitSettings({ fontSize: value });
+    };
+
     return settings ? (
         <MainBlock onWheel={onWheel}>
             <Slider sx={{ margin: "0px 2vw 0", width: "96vw" }} value={[settings.size.left, settings.size.right]} onChange={onHorizontalSize} />
@@ -128,7 +132,15 @@ export const Screen = () => {
                 <br />
                 Margin top: {Math.round(marginTop)}
                 <br />
-                Wheel changes speed, SHIFT + sheel scrolls text, noSleep: {noSleep.isEnabled ? "ON" : "off"}
+                noSleep: {noSleep.isEnabled ? "ON" : "off"}
+                <br />
+                Font size:{" "}
+                <Slider size="small" sx={{ width: "90px" }} max={60} min={5} value={settings.fontSize} onChange={onFontSize} valueLabelDisplay="auto" />{" "}
+                {settings.fontSize}
+                <br />
+                Wheel changes speed
+                <br />
+                SHIFT + sheel scrolls text,
             </Typography>
             <Container
                 sx={{
@@ -142,6 +154,7 @@ export const Screen = () => {
                     ref={textBlockRef}
                     sx={{
                         marginTop: Math.round(marginTop) + "px",
+                        fontSize: settings.fontSize + "px",
                     }}
                 >
                     Ahoj hubenouri, doufam ze se vam dari a uspesne se blizite k cilove postave. Mame uz brezen a moc mesicu nam do leta nezbyva. Ale i za ty

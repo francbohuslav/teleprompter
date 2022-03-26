@@ -10,6 +10,7 @@ export interface ClientToServerEvents {
 
 export interface IPersistanceSettings {
     speed: number;
+    fontSize: number;
     size: {
         top: number;
         left: number;
