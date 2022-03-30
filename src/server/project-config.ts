@@ -19,7 +19,7 @@ export class ProjectConfigurer {
         } else {
             config = { settings: null };
         }
-        config.settings = config.settings || { speed: null, fontSize: null, size: null };
+        config.settings = config.settings || { speed: null, fontSize: null, size: null, paused: false };
         config.settings.fontSize = config.settings.fontSize || 10;
         config.settings.speed = config.settings.speed || 4;
         config.settings.size = config.settings.size || { left: 25, right: 75, top: 75, bottom: 25 };

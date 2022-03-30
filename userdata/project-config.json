@@ -1,13 +1,13 @@
 {
   "settings": {
-    "speed": 7.51,
+    "speed": 10,
     "size": {
-      "left": 34,
-      "right": 69,
+      "left": 15,
+      "right": 61,
       "top": 69,
       "bottom": 10
     },
-    "fontSize": 26,
+    "fontSize": 27,
     "paused": false
   }
 }

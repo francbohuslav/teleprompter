@@ -6,9 +6,10 @@ import fs from "fs";
 import http from "http";
 import { Container } from "injector";
 import { Server } from "socket.io";
+import { IBaseResponse } from "../common/ajax-interfaces";
 import { ClientToServerEvents, IPersistanceSettings, ServerToClientEvents } from "../common/isocket";
 import { delay } from "../common/utils";
-import { IServerAction, IServerMethod, IServerMethodOptions } from "./iserver";
+import { IMiddleWare, IServerAction, IServerMethod, IServerMethodOptions } from "./iserver";
 import { ProjectConfigurer } from "./project-config";
 const json = require("body-parser").json;
 import path = require("path");
@@ -35,14 +36,12 @@ function sendError(res: Response, ex: any) {
     res.send(JSON.stringify(errorStructure, null, 2));
 }
 
-const methods: IServerMethod[] = [
-    // m("post", "/server/login", userRequester.login.bind(userRequester)),
-];
+const methods: IServerMethod[] = [m("get", "/server/get-text", (_req, _res) => cachedFs.readFile("text.txt"))];
 
 const processRequest = (method: IServerAction, _options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {
     try {
         const dataResult = await method(req, res);
-        const result: any = {
+        const result: IBaseResponse<unknown> = {
             data: dataResult,
         };
         const outputData = JSON.stringify(result, null, 2);
@@ -110,12 +109,12 @@ httpServer.listen(port, () => {
     });
 })();
 
-// function m(method: string, path: string, action: IServerAction, authorization?: IMiddleWare, options?: IServerMethodOptions): IServerMethod {
-//     return {
-//         action,
-//         method,
-//         path,
-//         authorization,
-//         options: options || {},
-//     };
-// }
+function m(method: string, path: string, action: IServerAction, authorization?: IMiddleWare, options?: IServerMethodOptions): IServerMethod {
+    return {
+        action,
+        method,
+        path,
+        authorization,
+        options: options || {},
+    };
+}
